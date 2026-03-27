@@ -5,185 +5,277 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Stars } from "@react-three/drei";
 import * as THREE from "three";
 
-// Low-poly road stretching to horizon
+// Flat road plane stretching to horizon
 function Road() {
-  const roadGeometry = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(4, 40, 1, 1);
-    return geo;
-  }, []);
-
   return (
-    <mesh geometry={roadGeometry} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 5]}>
-      <meshStandardMaterial color="#1a1a2e" roughness={0.9} />
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+      <planeGeometry args={[6, 80]} />
+      <meshStandardMaterial color="#111122" roughness={0.95} />
     </mesh>
   );
 }
 
-// Road center line dashes
+// Dashed center line
 function RoadMarkings() {
   const markings = useMemo(() => {
-    const positions = [];
-    for (let i = 0; i < 12; i++) {
-      positions.push(i * 3 - 4);
-    }
-    return positions;
+    return Array.from({ length: 18 }, (_, i) => -30 + i * 3.5);
   }, []);
 
   return (
     <>
       {markings.map((z, i) => (
-        <mesh key={i} position={[0, 0.01, z]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[0.06, 1.2]} />
-          <meshStandardMaterial color="#00d4ff" emissive="#00d4ff" emissiveIntensity={0.4} />
+        <mesh key={i} position={[0, 0.005, z]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.08, 1.4]} />
+          <meshStandardMaterial
+            color="#00d4ff"
+            emissive="#00d4ff"
+            emissiveIntensity={0.6}
+          />
         </mesh>
       ))}
     </>
   );
 }
 
-// Low-poly terrain on sides
+// Low flat terrain on sides — stays below camera horizon
 function Terrain({ side }: { side: "left" | "right" }) {
   const geo = useMemo(() => {
-    const g = new THREE.PlaneGeometry(10, 40, 8, 20);
+    const g = new THREE.PlaneGeometry(16, 80, 10, 24);
     const pos = g.attributes.position;
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const z = pos.getZ(i);
-      pos.setY(i, Math.sin(x * 0.4 + z * 0.2) * 0.4 + Math.random() * 0.3);
+      // Keep terrain very flat, slight undulation
+      pos.setY(i, Math.sin(x * 0.3 + z * 0.15) * 0.2 + Math.random() * 0.15);
     }
     g.computeVertexNormals();
     return g;
   }, []);
 
-  const x = side === "left" ? -7 : 7;
+  const x = side === "left" ? -11 : 11;
 
   return (
-    <mesh geometry={geo} rotation={[-Math.PI / 2, 0, 0]} position={[x, -0.1, 5]}>
+    <mesh geometry={geo} rotation={[-Math.PI / 2, 0, 0]} position={[x, -0.05, 0]}>
       <meshStandardMaterial
         color="#0d0d1a"
-        wireframe={false}
         roughness={1}
-        emissive="#0a0a2a"
-        emissiveIntensity={0.3}
+        emissive="#06061a"
+        emissiveIntensity={0.4}
       />
     </mesh>
   );
 }
 
-// Stylized low-poly travel trailer
-function TravelTrailer({ mouseX, mouseY }: { mouseX: React.MutableRefObject<number>; mouseY: React.MutableRefObject<number> }) {
+// Travel trailer — positioned further back on the road
+function TravelTrailer({
+  mouseX,
+  mouseY,
+}: {
+  mouseX: React.MutableRefObject<number>;
+  mouseY: React.MutableRefObject<number>;
+}) {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
-    // Gentle floating + mouse parallax
     groupRef.current.rotation.y = THREE.MathUtils.lerp(
       groupRef.current.rotation.y,
-      mouseX.current * 0.15,
+      mouseX.current * 0.1,
+      delta * 1.5
+    );
+    groupRef.current.position.y = THREE.MathUtils.lerp(
+      groupRef.current.position.y,
+      0 + Math.sin(Date.now() * 0.0008) * 0.03,
       delta * 2
     );
-    groupRef.current.position.y = -0.2 + Math.sin(Date.now() * 0.001) * 0.05;
   });
 
   return (
-    <group ref={groupRef} position={[0, -0.2, 2]}>
+    // Positioned further down the road so it doesn't block text
+    <group ref={groupRef} position={[0, 0, -12]} scale={1.3}>
+      {/* Truck cab */}
+      <mesh position={[-1.3, 0.38, 0]}>
+        <boxGeometry args={[1.0, 0.75, 1.1]} />
+        <meshStandardMaterial
+          color="#1a1a30"
+          roughness={0.5}
+          metalness={0.3}
+          emissive="#0a0a20"
+          emissiveIntensity={0.3}
+        />
+      </mesh>
+      {/* Cab roof */}
+      <mesh position={[-1.3, 0.82, 0]}>
+        <boxGeometry args={[0.8, 0.2, 1.0]} />
+        <meshStandardMaterial color="#12122a" roughness={0.6} />
+      </mesh>
+      {/* Windshield glow */}
+      <mesh position={[-1.82, 0.55, 0]}>
+        <planeGeometry args={[0.5, 0.35]} />
+        <meshStandardMaterial
+          color="#00d4ff"
+          emissive="#00d4ff"
+          emissiveIntensity={0.3}
+          transparent
+          opacity={0.4}
+        />
+      </mesh>
+
       {/* Trailer body */}
-      <mesh position={[0.6, 0.35, 0]}>
-        <boxGeometry args={[2.4, 0.7, 0.9]} />
-        <meshStandardMaterial color="#1a1a2e" roughness={0.6} metalness={0.3} emissive="#0a0a1e" emissiveIntensity={0.2} />
+      <mesh position={[0.8, 0.42, 0]}>
+        <boxGeometry args={[3.0, 0.85, 1.1]} />
+        <meshStandardMaterial
+          color="#16162e"
+          roughness={0.6}
+          metalness={0.2}
+          emissive="#0a0a1e"
+          emissiveIntensity={0.25}
+        />
       </mesh>
       {/* Trailer roof */}
-      <mesh position={[0.6, 0.76, 0]}>
-        <boxGeometry args={[2.2, 0.12, 0.85]} />
-        <meshStandardMaterial color="#12121a" roughness={0.7} />
+      <mesh position={[0.8, 0.9, 0]}>
+        <boxGeometry args={[2.8, 0.1, 1.05]} />
+        <meshStandardMaterial color="#0e0e22" roughness={0.8} />
       </mesh>
-      {/* Window glow */}
-      <mesh position={[0.8, 0.35, 0.46]}>
-        <planeGeometry args={[0.5, 0.3]} />
-        <meshStandardMaterial color="#00d4ff" emissive="#00d4ff" emissiveIntensity={0.8} transparent opacity={0.6} />
+
+      {/* Trailer windows — glowing */}
+      <mesh position={[1.2, 0.45, 0.56]}>
+        <planeGeometry args={[0.55, 0.3]} />
+        <meshStandardMaterial
+          color="#00d4ff"
+          emissive="#00d4ff"
+          emissiveIntensity={1.2}
+          transparent
+          opacity={0.7}
+        />
       </mesh>
-      <mesh position={[0.2, 0.35, 0.46]}>
-        <planeGeometry args={[0.3, 0.25]} />
-        <meshStandardMaterial color="#00d4ff" emissive="#00d4ff" emissiveIntensity={0.6} transparent opacity={0.5} />
+      <mesh position={[0.3, 0.45, 0.56]}>
+        <planeGeometry args={[0.35, 0.25]} />
+        <meshStandardMaterial
+          color="#00aaff"
+          emissive="#00aaff"
+          emissiveIntensity={0.9}
+          transparent
+          opacity={0.6}
+        />
       </mesh>
-      {/* Trailer hitch/tongue */}
-      <mesh position={[-0.95, 0.1, 0]}>
-        <boxGeometry args={[0.6, 0.06, 0.06]} />
-        <meshStandardMaterial color="#8888a0" metalness={0.8} roughness={0.2} />
+
+      {/* Hitch */}
+      <mesh position={[-0.85, 0.12, 0]}>
+        <boxGeometry args={[0.55, 0.07, 0.07]} />
+        <meshStandardMaterial color="#888899" metalness={0.9} roughness={0.2} />
       </mesh>
+
       {/* Wheels */}
-      {[-0.3, 0.9].map((x, i) => (
+      {[-0.1, 1.4].map((x, i) => (
         <group key={i}>
-          <mesh position={[x, -0.05, 0.47]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.16, 0.16, 0.1, 8]} />
-            <meshStandardMaterial color="#0a0a0f" roughness={0.9} />
-          </mesh>
-          <mesh position={[x, -0.05, -0.47]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.16, 0.16, 0.1, 8]} />
-            <meshStandardMaterial color="#0a0a0f" roughness={0.9} />
-          </mesh>
+          {[0.58, -0.58].map((z, j) => (
+            <mesh key={j} position={[x, -0.1, z]} rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[0.22, 0.22, 0.12, 8]} />
+              <meshStandardMaterial color="#0a0a14" roughness={0.9} />
+            </mesh>
+          ))}
         </group>
       ))}
-      {/* Truck cab */}
-      <mesh position={[-1.1, 0.28, 0]}>
-        <boxGeometry args={[0.8, 0.56, 0.85]} />
-        <meshStandardMaterial color="#12121a" roughness={0.6} metalness={0.2} />
-      </mesh>
-      <mesh position={[-1.1, 0.58, 0]}>
-        <boxGeometry args={[0.65, 0.22, 0.8]} />
-        <meshStandardMaterial color="#1a1a2e" roughness={0.5} />
-      </mesh>
-      {/* Headlights */}
-      <pointLight position={[-1.55, 0.28, 0.3]} color="#00d4ff" intensity={0.4} distance={3} />
-      <pointLight position={[-1.55, 0.28, -0.3]} color="#00d4ff" intensity={0.4} distance={3} />
+
+      {/* Headlights casting forward */}
+      <pointLight
+        position={[-1.9, 0.4, 0.4]}
+        color="#00d4ff"
+        intensity={1.5}
+        distance={8}
+      />
+      <pointLight
+        position={[-1.9, 0.4, -0.4]}
+        color="#00d4ff"
+        intensity={1.5}
+        distance={8}
+      />
     </group>
   );
 }
 
-// Cyan grid on ground
-function GroundGrid() {
+// Subtle cyan horizon glow
+function HorizonGlow() {
   return (
-    <gridHelper args={[40, 40, "#00d4ff", "#0a1a2e"]} position={[0, -0.5, 5]}>
-      <meshStandardMaterial transparent opacity={0.15} />
-    </gridHelper>
+    <mesh position={[0, 0.5, -35]}>
+      <planeGeometry args={[40, 6]} />
+      <meshStandardMaterial
+        color="#00d4ff"
+        emissive="#00d4ff"
+        emissiveIntensity={0.08}
+        transparent
+        opacity={0.06}
+      />
+    </mesh>
   );
 }
 
-function Scene({ mouseX, mouseY }: { mouseX: React.MutableRefObject<number>; mouseY: React.MutableRefObject<number> }) {
+function Scene({
+  mouseX,
+  mouseY,
+}: {
+  mouseX: React.MutableRefObject<number>;
+  mouseY: React.MutableRefObject<number>;
+}) {
   const { camera } = useThree();
 
   useFrame((_, delta) => {
-    camera.position.x = THREE.MathUtils.lerp(camera.position.x, mouseX.current * -0.3, delta * 1.5);
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, 0.8 + mouseY.current * 0.2, delta * 1.5);
-    camera.lookAt(0, 0, 2);
+    // Gentle camera drift with mouse
+    camera.position.x = THREE.MathUtils.lerp(
+      camera.position.x,
+      mouseX.current * -0.4,
+      delta * 1.2
+    );
+    camera.position.y = THREE.MathUtils.lerp(
+      camera.position.y,
+      1.8 + mouseY.current * 0.15,
+      delta * 1.2
+    );
+    camera.lookAt(0, 0.5, -20);
   });
 
   return (
     <>
-      <ambientLight intensity={0.3} />
-      <directionalLight position={[5, 5, 5]} intensity={0.5} color="#ffffff" />
-      <pointLight position={[0, 2, -5]} intensity={0.8} color="#00d4ff" distance={20} />
-      <Stars radius={80} depth={50} count={2000} factor={3} saturation={0} fade speed={0.5} />
+      {/* Lighting */}
+      <ambientLight intensity={0.6} color="#1a1a3a" />
+      <directionalLight position={[0, 8, 10]} intensity={0.4} color="#8888ff" />
+      {/* Road centerline glow light */}
+      <pointLight position={[0, 0.5, -8]} color="#00d4ff" intensity={1.0} distance={25} />
+      <pointLight position={[0, 0.5, -20]} color="#00d4ff" intensity={0.6} distance={20} />
+
+      {/* Stars */}
+      <Stars
+        radius={120}
+        depth={60}
+        count={3000}
+        factor={3}
+        saturation={0}
+        fade
+        speed={0.3}
+      />
+
       <Road />
       <RoadMarkings />
       <Terrain side="left" />
       <Terrain side="right" />
-      <GroundGrid />
+      <HorizonGlow />
       <TravelTrailer mouseX={mouseX} mouseY={mouseY} />
-      {/* Distant horizon glow */}
-      <mesh position={[0, 0, -18]}>
-        <planeGeometry args={[30, 4]} />
-        <meshStandardMaterial color="#00d4ff" emissive="#00d4ff" emissiveIntensity={0.05} transparent opacity={0.03} />
-      </mesh>
     </>
   );
 }
 
-export default function HeroScene({ mouseX, mouseY }: { mouseX: React.MutableRefObject<number>; mouseY: React.MutableRefObject<number> }) {
+export default function HeroScene({
+  mouseX,
+  mouseY,
+}: {
+  mouseX: React.MutableRefObject<number>;
+  mouseY: React.MutableRefObject<number>;
+}) {
   return (
     <Canvas
       className="absolute inset-0"
-      camera={{ position: [0, 0.8, 6], fov: 60 }}
+      camera={{ position: [0, 1.8, 8], fov: 55 }}
       gl={{ antialias: true, alpha: true }}
       dpr={[1, 1.5]}
     >
