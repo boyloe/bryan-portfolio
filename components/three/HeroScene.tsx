@@ -2,33 +2,70 @@
 
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Stars } from "@react-three/drei";
+import { Stars, Edges } from "@react-three/drei";
 import * as THREE from "three";
+
+// Helper: a box with a solid fill AND glowing cyan edges
+function GlowBox({
+  position,
+  size,
+  color = "#c8c8de",
+  edgeColor = "#00d4ff",
+  edgeThreshold = 15,
+  opacity = 1,
+  emissive = "#000000",
+  emissiveIntensity = 0,
+  metalness = 0.1,
+  roughness = 0.6,
+}: {
+  position: [number, number, number];
+  size: [number, number, number];
+  color?: string;
+  edgeColor?: string;
+  edgeThreshold?: number;
+  opacity?: number;
+  emissive?: string;
+  emissiveIntensity?: number;
+  metalness?: number;
+  roughness?: number;
+}) {
+  return (
+    <mesh position={position}>
+      <boxGeometry args={size} />
+      <meshStandardMaterial
+        color={color}
+        emissive={emissive}
+        emissiveIntensity={emissiveIntensity}
+        transparent={opacity < 1}
+        opacity={opacity}
+        metalness={metalness}
+        roughness={roughness}
+      />
+      <Edges threshold={edgeThreshold} color={edgeColor} />
+    </mesh>
+  );
+}
 
 function Road() {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
       <planeGeometry args={[7, 120]} />
-      <meshStandardMaterial color="#18182a" roughness={0.95} />
+      <meshStandardMaterial color="#141420" roughness={1} />
     </mesh>
   );
 }
 
 function RoadMarkings() {
   const markings = useMemo(
-    () => Array.from({ length: 24 }, (_, i) => -40 + i * 3.5),
+    () => Array.from({ length: 26 }, (_, i) => -42 + i * 3.5),
     []
   );
   return (
     <>
       {markings.map((z, i) => (
         <mesh key={i} position={[0, 0.01, z]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[0.1, 1.5]} />
-          <meshStandardMaterial
-            color="#00d4ff"
-            emissive="#00d4ff"
-            emissiveIntensity={0.8}
-          />
+          <planeGeometry args={[0.1, 1.6]} />
+          <meshStandardMaterial color="#00d4ff" emissive="#00d4ff" emissiveIntensity={0.9} />
         </mesh>
       ))}
     </>
@@ -37,25 +74,21 @@ function RoadMarkings() {
 
 function Terrain({ side }: { side: "left" | "right" }) {
   const geo = useMemo(() => {
-    const g = new THREE.PlaneGeometry(20, 120, 12, 30);
+    const g = new THREE.PlaneGeometry(22, 120, 14, 32);
     const pos = g.attributes.position;
     for (let i = 0; i < pos.count; i++) {
-      const x = pos.getX(i);
-      const z = pos.getZ(i);
-      pos.setY(i, Math.sin(x * 0.25 + z * 0.12) * 0.18 + Math.random() * 0.1);
+      pos.setY(i, Math.sin(pos.getX(i) * 0.3 + pos.getZ(i) * 0.12) * 0.15 + Math.random() * 0.08);
     }
     g.computeVertexNormals();
     return g;
   }, []);
-  const x = side === "left" ? -13 : 13;
   return (
-    <mesh geometry={geo} rotation={[-Math.PI / 2, 0, 0]} position={[x, -0.05, 0]}>
-      <meshStandardMaterial color="#0d0d1c" roughness={1} emissive="#08081a" emissiveIntensity={0.5} />
+    <mesh geometry={geo} rotation={[-Math.PI / 2, 0, 0]} position={[side === "left" ? -14 : 14, -0.05, 0]}>
+      <meshStandardMaterial color="#0c0c1a" roughness={1} emissive="#060614" emissiveIntensity={0.4} />
     </mesh>
   );
 }
 
-// Salem-style travel trailer — white/gray, boxy, with slide-out and awning
 function TravelTrailer({
   mouseX,
   mouseY,
@@ -69,7 +102,7 @@ function TravelTrailer({
     if (!groupRef.current) return;
     groupRef.current.rotation.y = THREE.MathUtils.lerp(
       groupRef.current.rotation.y,
-      mouseX.current * 0.08,
+      mouseX.current * 0.07,
       delta * 1.5
     );
     groupRef.current.position.y = THREE.MathUtils.lerp(
@@ -80,186 +113,101 @@ function TravelTrailer({
   });
 
   return (
-    <group ref={groupRef} position={[0.4, 0, -10]} scale={1.4}>
+    <group ref={groupRef} position={[0, 0, -9]} scale={1.5}>
 
-      {/* === TRUCK CAB (dark, facing camera-left) === */}
-      {/* Main cab body */}
-      <mesh position={[-2.1, 0.5, 0]}>
-        <boxGeometry args={[1.2, 1.0, 1.4]} />
-        <meshStandardMaterial color="#2a2a3a" roughness={0.4} metalness={0.4} />
-      </mesh>
+      {/* ── TRUCK CAB ── */}
+      <GlowBox position={[-2.0, 0.52, 0]} size={[1.15, 1.05, 1.45]} color="#252535" metalness={0.4} roughness={0.4} />
       {/* Cab roof */}
-      <mesh position={[-2.1, 1.08, 0]}>
-        <boxGeometry args={[1.0, 0.22, 1.3]} />
-        <meshStandardMaterial color="#222230" roughness={0.5} metalness={0.3} />
-      </mesh>
+      <GlowBox position={[-2.0, 1.1, 0]} size={[0.95, 0.22, 1.35]} color="#1e1e2e" metalness={0.3} roughness={0.5} />
       {/* Windshield */}
-      <mesh position={[-2.72, 0.6, 0]}>
-        <planeGeometry args={[0.55, 0.45]} />
-        <meshStandardMaterial color="#aaddff" emissive="#4488aa" emissiveIntensity={0.3} transparent opacity={0.6} />
-      </mesh>
-      {/* Side window */}
-      <mesh position={[-1.8, 0.62, 0.72]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[0.4, 0.32]} />
-        <meshStandardMaterial color="#aaddff" emissive="#4488aa" emissiveIntensity={0.2} transparent opacity={0.5} />
+      <mesh position={[-2.6, 0.62, 0]}>
+        <planeGeometry args={[0.55, 0.44]} />
+        <meshStandardMaterial color="#88ccff" emissive="#2255aa" emissiveIntensity={0.5} transparent opacity={0.65} />
       </mesh>
       {/* Headlights */}
-      <mesh position={[-2.72, 0.38, 0.42]}>
-        <planeGeometry args={[0.18, 0.12]} />
-        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={2.0} />
-      </mesh>
-      <mesh position={[-2.72, 0.38, -0.42]}>
-        <planeGeometry args={[0.18, 0.12]} />
-        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={2.0} />
-      </mesh>
-      {/* Headlight glow */}
-      <pointLight position={[-3.0, 0.4, 0.4]} color="#ffffff" intensity={1.5} distance={5} />
-      <pointLight position={[-3.0, 0.4, -0.4]} color="#ffffff" intensity={1.5} distance={5} />
+      {[0.46, -0.46].map((z, i) => (
+        <mesh key={i} position={[-2.6, 0.38, z]}>
+          <planeGeometry args={[0.2, 0.13]} />
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={3.0} />
+        </mesh>
+      ))}
+      <pointLight position={[-3.0, 0.4, 0.45]} color="#ffffff" intensity={2.0} distance={6} />
+      <pointLight position={[-3.0, 0.4, -0.45]} color="#ffffff" intensity={2.0} distance={6} />
+
       {/* Truck wheels */}
-      {[-1.6, -2.55].map((x, i) =>
-        [0.78, -0.78].map((z, j) => (
-          <group key={`tw-${i}-${j}`}>
-            <mesh position={[x, -0.08, z]} rotation={[Math.PI / 2, 0, 0]}>
-              <cylinderGeometry args={[0.28, 0.28, 0.18, 10]} />
-              <meshStandardMaterial color="#111118" roughness={0.95} />
-            </mesh>
-            <mesh position={[x, -0.08, z]} rotation={[Math.PI / 2, 0, 0]}>
-              <cylinderGeometry args={[0.16, 0.16, 0.2, 8]} />
-              <meshStandardMaterial color="#888899" metalness={0.8} roughness={0.3} />
-            </mesh>
-          </group>
+      {[-1.55, -2.48].map((x, i) =>
+        [0.83, -0.83].map((z, j) => (
+          <mesh key={`tw-${i}-${j}`} position={[x, -0.08, z]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.28, 0.28, 0.17, 10]} />
+            <meshStandardMaterial color="#111118" roughness={0.95} />
+          </mesh>
         ))
       )}
       {/* Hitch */}
-      <mesh position={[-0.98, 0.1, 0]}>
-        <boxGeometry args={[0.7, 0.08, 0.08]} />
-        <meshStandardMaterial color="#999aaa" metalness={0.9} roughness={0.2} />
+      <mesh position={[-0.92, 0.1, 0]}>
+        <boxGeometry args={[0.65, 0.08, 0.08]} />
+        <meshStandardMaterial color="#aaaabc" metalness={0.9} roughness={0.2} />
+        <Edges color="#00d4ff" />
       </mesh>
 
-      {/* === TRAILER BODY === */}
-      {/* Main white/gray body */}
-      <mesh position={[1.2, 0.62, 0]}>
-        <boxGeometry args={[4.0, 1.25, 1.5]} />
-        <meshStandardMaterial color="#dcdce8" roughness={0.6} metalness={0.1} />
-      </mesh>
-      {/* Dark lower skirt stripe */}
-      <mesh position={[1.2, 0.02, 0]}>
-        <boxGeometry args={[4.02, 0.2, 1.52]} />
-        <meshStandardMaterial color="#222233" roughness={0.7} />
-      </mesh>
-      {/* Accent stripe (Salem-style dark stripe) */}
-      <mesh position={[1.2, 1.1, 0.76]}>
-        <planeGeometry args={[3.8, 0.18]} />
-        <meshStandardMaterial color="#1a1a3a" roughness={0.5} />
-      </mesh>
-      {/* Roof */}
-      <mesh position={[1.2, 1.28, 0]}>
-        <boxGeometry args={[4.0, 0.1, 1.48]} />
-        <meshStandardMaterial color="#c8c8d8" roughness={0.7} metalness={0.1} />
-      </mesh>
-      {/* Front cap (curved look via angled face) */}
-      <mesh position={[-0.82, 0.62, 0]}>
-        <boxGeometry args={[0.08, 1.25, 1.5]} />
-        <meshStandardMaterial color="#c8c8d8" roughness={0.6} />
+      {/* ── TRAILER BODY (main white/gray shell) ── */}
+      <GlowBox position={[1.1, 0.65, 0]} size={[4.2, 1.3, 1.6]} color="#d8d8e8" edgeColor="#00d4ff" />
+      {/* Dark skirt at bottom */}
+      <GlowBox position={[1.1, 0.03, 0]} size={[4.22, 0.18, 1.62]} color="#1e1e30" edgeColor="#00d4ff" />
+      {/* Roof cap */}
+      <GlowBox position={[1.1, 1.33, 0]} size={[4.1, 0.1, 1.55]} color="#ccccdc" edgeColor="#00d4ff" />
+      {/* Accent stripe (dark band around mid) */}
+      <mesh position={[1.1, 0.95, 0.81]}>
+        <planeGeometry args={[4.0, 0.15]} />
+        <meshStandardMaterial color="#1a1a3a" emissive="#0a0a28" emissiveIntensity={0.4} />
       </mesh>
 
-      {/* === SLIDE-OUT (right side) === */}
-      <mesh position={[0.8, 0.5, -0.9]}>
-        <boxGeometry args={[1.4, 0.9, 0.22]} />
-        <meshStandardMaterial color="#d0d0de" roughness={0.6} metalness={0.1} />
-      </mesh>
-      {/* Slide-out bottom */}
-      <mesh position={[0.8, 0.07, -0.9]}>
-        <boxGeometry args={[1.42, 0.12, 0.22]} />
-        <meshStandardMaterial color="#999aaa" roughness={0.6} />
-      </mesh>
+      {/* ── SLIDE-OUT ── */}
+      <GlowBox position={[0.6, 0.52, -0.94]} size={[1.5, 0.95, 0.25]} color="#ccccdc" edgeColor="#00d4ff" />
 
-      {/* === WINDOWS (front/visible side) === */}
-      {[[-0.2, 0.65], [0.8, 0.65], [1.9, 0.65], [2.7, 0.65]].map(([x, y], i) => (
-        <mesh key={`win-${i}`} position={[x, y, 0.76]}>
-          <planeGeometry args={[0.45, 0.35]} />
-          <meshStandardMaterial
-            color="#88ccee"
-            emissive="#2266aa"
-            emissiveIntensity={0.5}
-            transparent
-            opacity={0.75}
-          />
+      {/* ── WINDOWS ── */}
+      {[[-0.3, 0.68], [0.75, 0.68], [1.9, 0.68], [2.75, 0.68]].map(([x, y], i) => (
+        <mesh key={`w-${i}`} position={[x, y, 0.81]}>
+          <planeGeometry args={[0.48, 0.36]} />
+          <meshStandardMaterial color="#66aadd" emissive="#1155aa" emissiveIntensity={0.7} transparent opacity={0.8} />
         </mesh>
       ))}
 
-      {/* === DOOR === */}
-      <mesh position={[2.4, 0.42, 0.77]}>
-        <planeGeometry args={[0.55, 0.82]} />
-        <meshStandardMaterial color="#bbbbcc" roughness={0.5} metalness={0.2} />
-      </mesh>
-      {/* Door window */}
-      <mesh position={[2.4, 0.72, 0.775]}>
+      {/* ── DOOR ── */}
+      <GlowBox position={[2.35, 0.44, 0.82]} size={[0.55, 0.85, 0.04]} color="#bbbbcc" edgeColor="#00d4ff" />
+      <mesh position={[2.35, 0.72, 0.845]}>
         <planeGeometry args={[0.32, 0.28]} />
-        <meshStandardMaterial color="#88ccee" emissive="#2266aa" emissiveIntensity={0.4} transparent opacity={0.7} />
-      </mesh>
-      {/* Door handle */}
-      <mesh position={[2.22, 0.42, 0.78]}>
-        <boxGeometry args={[0.04, 0.12, 0.04]} />
-        <meshStandardMaterial color="#888899" metalness={0.9} roughness={0.2} />
+        <meshStandardMaterial color="#66aadd" emissive="#1155aa" emissiveIntensity={0.5} transparent opacity={0.7} />
       </mesh>
 
-      {/* === AWNING (extends over door) === */}
-      <mesh position={[2.4, 1.28, 1.1]} rotation={[0.15, 0, 0]}>
-        <boxGeometry args={[1.2, 0.04, 0.8]} />
-        <meshStandardMaterial color="#336688" roughness={0.7} transparent opacity={0.9} />
+      {/* ── AWNING ── */}
+      <mesh position={[2.35, 1.34, 1.22]} rotation={[0.2, 0, 0]}>
+        <boxGeometry args={[1.3, 0.05, 0.85]} />
+        <meshStandardMaterial color="#224466" roughness={0.7} />
+        <Edges color="#00aaff" />
       </mesh>
-      {/* Awning support poles */}
-      {[1.9, 2.9].map((x, i) => (
-        <mesh key={`aw-${i}`} position={[x, 0.9, 1.42]}>
-          <cylinderGeometry args={[0.025, 0.025, 0.8, 6]} />
-          <meshStandardMaterial color="#888899" metalness={0.7} roughness={0.3} />
+      {[1.78, 2.9].map((x, i) => (
+        <mesh key={`ap-${i}`} position={[x, 0.88, 1.46]}>
+          <cylinderGeometry args={[0.025, 0.025, 0.92, 6]} />
+          <meshStandardMaterial color="#aaaabc" metalness={0.7} roughness={0.3} />
         </mesh>
       ))}
 
-      {/* === TRAILER WHEELS === */}
-      {[0.3, 1.5].map((x, i) =>
-        [0.84, -0.84].map((z, j) => (
-          <group key={`rw-${i}-${j}`}>
-            <mesh position={[x, -0.07, z]} rotation={[Math.PI / 2, 0, 0]}>
-              <cylinderGeometry args={[0.28, 0.28, 0.16, 10]} />
-              <meshStandardMaterial color="#111118" roughness={0.95} />
-            </mesh>
-            <mesh position={[x, -0.07, z]} rotation={[Math.PI / 2, 0, 0]}>
-              <cylinderGeometry args={[0.15, 0.15, 0.18, 8]} />
-              <meshStandardMaterial color="#888899" metalness={0.8} roughness={0.3} />
-            </mesh>
-          </group>
-        ))
-      )}
-
-      {/* === JACKS (front stabilizers) === */}
-      {[-0.5, 2.9].map((x, i) =>
-        [0.6, -0.6].map((z, j) => (
-          <mesh key={`jack-${i}-${j}`} position={[x, -0.22, z]}>
-            <cylinderGeometry args={[0.04, 0.04, 0.48, 6]} />
-            <meshStandardMaterial color="#888899" metalness={0.6} roughness={0.4} />
+      {/* ── TRAILER WHEELS ── */}
+      {[0.2, 1.6].map((x, i) =>
+        [0.9, -0.9].map((z, j) => (
+          <mesh key={`rw-${i}-${j}`} position={[x, -0.08, z]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.27, 0.27, 0.16, 10]} />
+            <meshStandardMaterial color="#111118" roughness={0.95} />
           </mesh>
         ))
       )}
 
-      {/* Lighting on trailer for visibility */}
-      <pointLight position={[1.2, 2.5, 2]} color="#e8eeff" intensity={3.0} distance={8} />
-      <pointLight position={[1.2, 1.5, -2]} color="#aabbff" intensity={1.5} distance={6} />
+      {/* Dedicated lighting so trailer is always visible */}
+      <pointLight position={[1.1, 3.5, 3.5]} color="#ffffff" intensity={5.0} distance={10} />
+      <pointLight position={[-1.0, 2.0, -2.5]} color="#8899ff" intensity={2.0} distance={8} />
+      <pointLight position={[3.5, 1.5, 2.0]} color="#cceeff" intensity={2.5} distance={8} />
     </group>
-  );
-}
-
-function HorizonGlow() {
-  return (
-    <>
-      <mesh position={[0, 0.3, -40]}>
-        <planeGeometry args={[50, 5]} />
-        <meshStandardMaterial color="#00d4ff" emissive="#00d4ff" emissiveIntensity={0.1} transparent opacity={0.05} />
-      </mesh>
-      {/* Road vanishing point glow */}
-      <pointLight position={[0, 0.2, -30]} color="#00d4ff" intensity={0.8} distance={35} />
-    </>
   );
 }
 
@@ -270,31 +218,31 @@ function Scene({
   mouseX: React.MutableRefObject<number>;
   mouseY: React.MutableRefObject<number>;
 }) {
-  const { camera } = useThree();
+  const { camera, scene } = useThree();
+
+  useMemo(() => {
+    scene.fog = new THREE.FogExp2("#0a0a0f", 0.018);
+  }, [scene]);
 
   useFrame((_, delta) => {
     camera.position.x = THREE.MathUtils.lerp(camera.position.x, mouseX.current * -0.5, delta * 1.2);
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, 1.6 + mouseY.current * 0.1, delta * 1.2);
-    camera.lookAt(0.4, 0.6, -10);
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, 1.5 + mouseY.current * 0.1, delta * 1.2);
+    camera.lookAt(0.4, 0.65, -9);
   });
 
   return (
     <>
-      {/* Key light — bright from upper left */}
-      <directionalLight position={[-4, 8, 6]} intensity={2.5} color="#ffffff" castShadow />
-      {/* Fill light — right side */}
-      <directionalLight position={[6, 4, 2]} intensity={1.2} color="#cce0ff" />
-      {/* Ambient — lifts the shadows */}
-      <ambientLight intensity={1.0} color="#8899cc" />
-      {/* Road glow */}
-      <pointLight position={[0, 0.3, -6]} color="#00d4ff" intensity={1.2} distance={20} />
+      <ambientLight intensity={0.8} color="#9999cc" />
+      <directionalLight position={[-3, 10, 8]} intensity={2.0} color="#ffffff" />
+      <directionalLight position={[6, 4, 2]} intensity={1.0} color="#ccddff" />
+      <pointLight position={[0, 0.3, -5]} color="#00d4ff" intensity={1.5} distance={25} />
+      <pointLight position={[0, 0.3, -25]} color="#00d4ff" intensity={0.8} distance={30} />
 
       <Stars radius={120} depth={60} count={3500} factor={3} saturation={0} fade speed={0.3} />
       <Road />
       <RoadMarkings />
       <Terrain side="left" />
       <Terrain side="right" />
-      <HorizonGlow />
       <TravelTrailer mouseX={mouseX} mouseY={mouseY} />
     </>
   );
@@ -310,7 +258,7 @@ export default function HeroScene({
   return (
     <Canvas
       className="absolute inset-0"
-      camera={{ position: [3, 1.6, 5], fov: 52 }}
+      camera={{ position: [3.5, 1.5, 4], fov: 50 }}
       gl={{ antialias: true, alpha: true }}
       dpr={[1, 1.5]}
     >
