@@ -84,8 +84,8 @@ export default function Skills() {
   }, [started, visibleCount, lines]);
 
   return (
-    <section id="skills" className="py-36 px-6">
-      <div className="max-w-4xl mx-auto">
+    <section id="skills" style={{ paddingTop: "9rem", paddingBottom: "9rem" }}>
+      <div className="section-container">
         <SectionHeading
           label="// skills"
           title="Tech Stack"

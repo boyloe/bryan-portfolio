@@ -56,7 +56,7 @@ export default function Navbar() {
           borderBottom: scrolled ? "1px solid var(--border)" : "1px solid transparent",
         }}
       >
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="section-container h-16 flex items-center justify-between">
           {/* Logo */}
           <Link
             href="/"

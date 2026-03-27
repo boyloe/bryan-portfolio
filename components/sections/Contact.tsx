@@ -62,8 +62,8 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-36 px-6">
-      <div className="max-w-6xl mx-auto">
+    <section id="contact" style={{ paddingTop: "9rem", paddingBottom: "9rem" }}>
+      <div className="section-container">
         <SectionHeading
           label="// contact"
           title="Get in Touch"

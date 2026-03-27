@@ -6,8 +6,8 @@ import SectionHeading from "@/components/ui/SectionHeading";
 
 export default function About() {
   return (
-    <section id="about" className="py-36 px-6">
-      <div className="max-w-6xl mx-auto">
+    <section id="about" style={{ paddingTop: "9rem", paddingBottom: "9rem" }}>
+      <div className="section-container">
         <SectionHeading label="// about" title="About Me" />
 
         <motion.div

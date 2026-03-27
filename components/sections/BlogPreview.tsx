@@ -19,8 +19,8 @@ function ExternalLinkIcon() {
 
 export default function BlogPreview() {
   return (
-    <section id="blog" className="py-36 px-6" style={{ background: "var(--bg-secondary)" }}>
-      <div className="max-w-6xl mx-auto">
+    <section id="blog" style={{ paddingTop: "9rem", paddingBottom: "9rem", background: "var(--bg-secondary)" }}>
+      <div className="section-container">
         <SectionHeading
           label="// writing"
           title="From the Blog"

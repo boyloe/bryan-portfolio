@@ -97,7 +97,7 @@ export default function Hero() {
       />
 
       {/* Content */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+      <div className="relative z-10 section-container text-center">
         <motion.div
           variants={staggerContainer}
           initial="hidden"

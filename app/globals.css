@@ -79,6 +79,30 @@ body::before {
   color: var(--accent-primary);
 }
 
+/* Layout containers */
+.section-container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+@media (min-width: 768px) {
+  .section-container {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-container {
+    padding-left: 6rem;
+    padding-right: 6rem;
+  }
+}
+
 /* Glow utility */
 .glow {
   box-shadow: 0 0 20px var(--accent-glow), 0 0 40px rgba(0, 212, 255, 0.05);

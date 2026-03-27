@@ -18,7 +18,7 @@ const PLATFORMS = ["All", "Medium", "Dev.to"];
 export default function BlogPage() {
   return (
     <div className="min-h-screen pt-24 pb-20 px-6">
-      <div className="max-w-3xl mx-auto">
+      <div className="section-container">
         {/* Header */}
         <div className="mb-12">
           <p className="text-sm font-mono tracking-widest uppercase mb-3" style={{ color: "var(--accent-primary)" }}>
