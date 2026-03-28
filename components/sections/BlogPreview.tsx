@@ -19,7 +19,7 @@ function ExternalLinkIcon() {
 
 export default function BlogPreview() {
   return (
-    <section id="blog" style={{ paddingTop: "9rem", paddingBottom: "9rem", background: "var(--bg-secondary)" }}>
+    <section id="blog" style={{ paddingTop: "10rem", paddingBottom: "10rem", background: "var(--bg-primary)" }}>
       <div className="section-container">
         <SectionHeading
           label="// writing"
@@ -43,13 +43,14 @@ export default function BlogPreview() {
               variants={fadeInUp}
               className="group block rounded-lg overflow-hidden relative"
               style={{
-                background: "var(--bg-primary)",
-                border: "1px solid var(--border)",
+                background: "var(--bg-card)",
+                border: "1px solid rgba(0,212,255,0.12)",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
               }}
               whileHover={{
-                y: -4,
-                borderColor: "rgba(0,212,255,0.3)",
-                boxShadow: "0 8px 30px rgba(0,212,255,0.06)",
+                y: -6,
+                borderColor: "rgba(0,212,255,0.35)",
+                boxShadow: "0 12px 40px rgba(0,0,0,0.5), 0 0 24px rgba(0,212,255,0.07)",
               }}
               transition={{ duration: 0.2 }}
             >

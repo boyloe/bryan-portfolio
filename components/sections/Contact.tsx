@@ -62,7 +62,7 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" style={{ paddingTop: "9rem", paddingBottom: "9rem" }}>
+    <section id="contact" style={{ paddingTop: "10rem", paddingBottom: "10rem", background: "var(--bg-secondary)" }}>
       <div className="section-container">
         <SectionHeading
           label="// contact"
@@ -75,7 +75,7 @@ export default function Contact() {
           initial="hidden"
           whileInView="visible"
           viewport={viewportOptions}
-          className="grid md:grid-cols-2 gap-12"
+          className="grid md:grid-cols-2 gap-16"
         >
           {/* Form */}
           <motion.form variants={fadeInLeft} onSubmit={handleSubmit} className="space-y-5">
@@ -180,14 +180,17 @@ export default function Contact() {
                 onClick={copyEmail}
                 className="group flex items-center gap-3 p-4 rounded-lg w-full text-left transition-all duration-200"
                 style={{
-                  background: "var(--bg-secondary)",
-                  border: "1px solid var(--border)",
+                  background: "var(--bg-card)",
+                  border: "1px solid rgba(0,212,255,0.12)",
+                  boxShadow: "0 2px 16px rgba(0,0,0,0.4)",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,212,255,0.3)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,212,255,0.35)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 24px rgba(0,0,0,0.5), 0 0 16px rgba(0,212,255,0.06)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,212,255,0.12)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 16px rgba(0,0,0,0.4)";
                 }}
               >
                 <span style={{ color: "var(--accent-primary)" }}>@</span>
@@ -213,18 +216,21 @@ export default function Contact() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 p-4 rounded-lg transition-all duration-200"
                   style={{
-                    background: "var(--bg-secondary)",
-                    border: "1px solid var(--border)",
+                    background: "var(--bg-card)",
+                    border: "1px solid rgba(0,212,255,0.12)",
                     color: "var(--text-primary)",
                     textDecoration: "none",
+                    boxShadow: "0 2px 16px rgba(0,0,0,0.4)",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,212,255,0.3)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,212,255,0.35)";
                     (e.currentTarget as HTMLElement).style.color = "var(--accent-primary)";
+                    (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 24px rgba(0,0,0,0.5), 0 0 16px rgba(0,212,255,0.06)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,212,255,0.12)";
                     (e.currentTarget as HTMLElement).style.color = "var(--text-primary)";
+                    (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 16px rgba(0,0,0,0.4)";
                   }}
                 >
                   <span className="text-xs font-mono w-16 flex-shrink-0" style={{ color: "var(--text-secondary)" }}>
@@ -241,15 +247,18 @@ export default function Contact() {
               download
               className="flex items-center justify-center gap-2 p-4 rounded-lg font-mono text-sm transition-all duration-200"
               style={{
-                background: "var(--bg-secondary)",
-                border: "1px solid rgba(0,212,255,0.2)",
+                background: "var(--bg-card)",
+                border: "1px solid rgba(0,212,255,0.25)",
                 color: "var(--accent-primary)",
+                boxShadow: "0 2px 16px rgba(0,0,0,0.4)",
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "var(--accent-glow)";
+                (e.currentTarget as HTMLElement).style.background = "rgba(0,212,255,0.08)";
+                (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 24px rgba(0,0,0,0.5), 0 0 20px rgba(0,212,255,0.1)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "var(--bg-secondary)";
+                (e.currentTarget as HTMLElement).style.background = "var(--bg-card)";
+                (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 16px rgba(0,0,0,0.4)";
               }}
             >
               ↓ Download Resume

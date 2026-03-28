@@ -159,12 +159,25 @@ function ItemContent({
 }) {
   return (
     <div
-      className="rounded-lg p-5 cursor-pointer group transition-all duration-300"
+      className="rounded-xl p-6 cursor-pointer group transition-all duration-300"
       style={{
-        background: "var(--bg-secondary)",
-        border: `1px solid ${previousCareer ? "rgba(136,136,160,0.2)" : "var(--border)"}`,
+        background: "var(--bg-card)",
+        border: `1px solid ${previousCareer ? "rgba(136,136,160,0.25)" : "rgba(0, 212, 255, 0.12)"}`,
+        boxShadow: previousCareer
+          ? "0 4px 24px rgba(0,0,0,0.4)"
+          : "0 4px 24px rgba(0,0,0,0.4), 0 0 0 0 transparent",
       }}
       onClick={onToggle}
+      onMouseEnter={(e) => {
+        if (!previousCareer) {
+          (e.currentTarget as HTMLElement).style.borderColor = "rgba(0, 212, 255, 0.3)";
+          (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(0,212,255,0.06)";
+        }
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor = previousCareer ? "rgba(136,136,160,0.25)" : "rgba(0, 212, 255, 0.12)";
+        (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 24px rgba(0,0,0,0.4)";
+      }}
     >
       {note && (
         <span
@@ -179,15 +192,15 @@ function ItemContent({
         </span>
       )}
       <h3
-        className="text-lg font-bold font-mono mb-1"
+        className="text-xl font-bold font-mono mb-2"
         style={{ color: previousCareer ? "var(--text-secondary)" : "var(--text-primary)" }}
       >
         {title}
       </h3>
-      <p className="font-medium mb-1" style={{ color: "var(--accent-primary)" }}>
+      <p className="font-semibold mb-2" style={{ color: "var(--accent-primary)", fontSize: "1rem" }}>
         {company}
       </p>
-      <div className={`flex gap-3 text-sm mb-3 ${align === "right" ? "justify-end" : ""}`} style={{ color: "var(--text-secondary)" }}>
+      <div className={`flex gap-3 text-sm mb-4 ${align === "right" ? "justify-end" : ""}`} style={{ color: "var(--text-secondary)" }}>
         <span>{period}</span>
         <span>·</span>
         <span>{location}</span>

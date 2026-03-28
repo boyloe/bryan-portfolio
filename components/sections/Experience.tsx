@@ -6,7 +6,7 @@ import { EXPERIENCE } from "@/lib/constants";
 
 export default function Experience() {
   return (
-    <section id="experience" style={{ paddingTop: "9rem", paddingBottom: "9rem", background: "var(--bg-secondary)" }}>
+    <section id="experience" style={{ paddingTop: "10rem", paddingBottom: "10rem", background: "var(--bg-tertiary)" }}>
       <div className="section-container">
         <SectionHeading
           label="// experience"
@@ -27,7 +27,7 @@ export default function Experience() {
             style={{ background: "linear-gradient(to bottom, transparent, var(--accent-primary), transparent)", opacity: 0.3 }}
           />
 
-          <div className="space-y-12">
+          <div className="space-y-16">
             {EXPERIENCE.map((job, i) => (
               <TimelineItem key={i} {...job} index={i} />
             ))}

@@ -84,7 +84,7 @@ export default function Skills() {
   }, [started, visibleCount, lines]);
 
   return (
-    <section id="skills" style={{ paddingTop: "9rem", paddingBottom: "9rem" }}>
+    <section id="skills" style={{ paddingTop: "10rem", paddingBottom: "10rem", background: "var(--bg-tertiary)" }}>
       <div className="section-container">
         <SectionHeading
           label="// skills"
@@ -103,9 +103,9 @@ export default function Skills() {
           <div
             className="rounded-xl overflow-hidden"
             style={{
-              border: "1px solid var(--border)",
-              background: "var(--bg-secondary)",
-              boxShadow: "0 0 40px rgba(0,212,255,0.05)",
+              border: "1px solid rgba(0,212,255,0.15)",
+              background: "var(--bg-card)",
+              boxShadow: "0 8px 40px rgba(0,0,0,0.5), 0 0 60px rgba(0,212,255,0.04)",
             }}
           >
             {/* Title bar */}

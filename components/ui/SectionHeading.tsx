@@ -12,7 +12,7 @@ interface SectionHeadingProps {
 export default function SectionHeading({ label, title, subtitle }: SectionHeadingProps) {
   return (
     <motion.div
-      className="mb-16"
+      className="mb-20"
       initial="hidden"
       whileInView="visible"
       viewport={viewportOptions}

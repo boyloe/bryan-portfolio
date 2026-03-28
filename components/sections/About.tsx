@@ -6,7 +6,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 
 export default function About() {
   return (
-    <section id="about" style={{ paddingTop: "9rem", paddingBottom: "9rem" }}>
+    <section id="about" style={{ paddingTop: "10rem", paddingBottom: "10rem", background: "var(--bg-secondary)" }}>
       <div className="section-container">
         <SectionHeading label="// about" title="About Me" />
 
@@ -15,7 +15,7 @@ export default function About() {
           initial="hidden"
           whileInView="visible"
           viewport={viewportOptions}
-          className="grid md:grid-cols-2 gap-16 items-start"
+          className="grid md:grid-cols-2 gap-20 items-start"
         >
           {/* Text */}
           <motion.div variants={fadeInLeft} className="space-y-5">
@@ -30,9 +30,9 @@ export default function About() {
             </p>
 
             <div
-              className="mt-6 p-4 rounded-lg border-l-2"
+              className="mt-6 p-5 rounded-xl border-l-2"
               style={{
-                background: "var(--bg-secondary)",
+                background: "var(--bg-card)",
                 borderColor: "var(--accent-primary)",
                 borderLeft: "2px solid var(--accent-primary)",
               }}
@@ -69,11 +69,12 @@ export default function About() {
           {/* Visual: Travel map placeholder */}
           <motion.div variants={fadeInRight} className="relative">
             <div
-              className="rounded-lg overflow-hidden relative"
+              className="rounded-xl overflow-hidden relative"
               style={{
-                background: "var(--bg-secondary)",
-                border: "1px solid var(--border)",
+                background: "var(--bg-card)",
+                border: "1px solid rgba(0,212,255,0.12)",
                 minHeight: 320,
+                boxShadow: "0 4px 32px rgba(0,0,0,0.4)",
               }}
             >
               {/* Stylized map background */}
