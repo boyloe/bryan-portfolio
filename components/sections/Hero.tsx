@@ -8,7 +8,7 @@ import TypingAnimation from "@/components/ui/TypingAnimation";
 import SceneFallback from "@/components/three/SceneFallback";
 import Button from "@/components/ui/Button";
 
-const HeroScene = lazy(() => import("@/components/three/HeroScene"));
+const HeroScene = lazy(() => import("@/components/three/HeroSceneA"));
 
 function GithubIcon() {
   return (
