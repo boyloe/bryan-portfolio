@@ -1,118 +1,195 @@
 export const PERSONAL = {
   name: "Bryan Oyloe",
-  title: "Full Stack Software Engineer",
+  role: "Full-Stack Engineer for Customer-Facing Systems",
   email: "boyloe@gmail.com",
-  location: "Remote — currently traveling the US & Canada",
+  location: "Remote — United States",
   github: "https://github.com/boyloe",
   linkedin: "https://linkedin.com/in/bryan-oyloe",
-  resumeUrl: "/resume/Bryan_Oyloe_Resume.pdf",
+  resumeUrl: "/resume/bryan-oyloe-forward-deployed-engineer.pdf",
+  caseStudyPdfUrl: "/case-studies/bryan-oyloe-private-systems-case-studies.pdf",
 };
+
+export type CaseStudy = {
+  slug: string;
+  index: string;
+  name: string;
+  descriptor: string;
+  summary: string;
+  role: string;
+  technologies: string[];
+  evidence: { value: string; label: string }[];
+  problem: string;
+  ownership: string;
+  decisions: { title: string; body: string }[];
+  tradeoffs: string[];
+  verification: string[];
+  architecture: { label: string; detail: string }[];
+};
+
+export const CASE_STUDIES: CaseStudy[] = [
+  {
+    slug: "job-search-command-center",
+    index: "01",
+    name: "Job Search Command Center",
+    descriptor: "Multi-source data + structured LLM evaluation",
+    summary:
+      "A privately operated system that turns inconsistent ATS feeds into a normalized, cost-aware application workflow with explainable recommendations.",
+    role: "System design, adapters, data model, evaluation contracts, dashboard, deployment, and operations",
+    technologies: ["Python", "SQLite", "ATS APIs", "LLM evaluation", "FastAPI", "Telegram"],
+    evidence: [
+      { value: "3", label: "ATS adapters" },
+      { value: "89 + 2", label: "tests and subtests" },
+      { value: "1", label: "durable source of truth" },
+    ],
+    problem:
+      "Job leads arrived from different applicant-tracking systems with inconsistent fields and duplicated lifecycle work. Generic keyword matching obscured seniority, location, compensation, and application-plausibility risks. Model calls also needed explicit cost controls.",
+    ownership:
+      "I designed and built the ingestion adapters, normalized data model, evaluation contracts, application-state workflow, operational dashboard, scheduled pipeline, Telegram digest, private deployment, and test coverage.",
+    decisions: [
+      {
+        title: "Keep source quirks at the edge",
+        body: "Each ATS owns its retrieval and normalization logic. Downstream evaluation consumes one source-agnostic contract instead of accumulating vendor conditionals.",
+      },
+      {
+        title: "Put deterministic state around model output",
+        body: "Deduplication, eligibility, lifecycle transitions, and cost gates remain deterministic. LLM output is schema-validated and stored with model, latency, token, prompt-version, and cost telemetry.",
+      },
+      {
+        title: "Treat cost as a product constraint",
+        body: "Already-evaluated, applied, closed, incomplete, or implausible records are filtered before model use. The dashboard cannot trigger paid evaluation.",
+      },
+      {
+        title: "Design an operational surface, not a demo",
+        body: "The dashboard exposes recommendations, run health, service state, and application lifecycle while keeping ingestion and scheduler controls outside the UI.",
+      },
+    ],
+    tradeoffs: [
+      "SQLite favors operational simplicity over horizontal scale.",
+      "A private network and shared token fit a single-user threat model; this is not multi-tenant authentication.",
+      "Explicit workflow boundaries add code but reduce accidental spend and state corruption.",
+    ],
+    verification: [
+      "89 tests plus 2 subtests pass in the private repository.",
+      "Three independently implemented ATS integrations use a common normalized contract.",
+      "Evaluation output is schema-constrained and recorded with per-run telemetry.",
+      "The private service is monitored through health and administration views.",
+    ],
+    architecture: [
+      { label: "ATS sources", detail: "Ashby · Greenhouse · Lever" },
+      { label: "Adapters", detail: "retrieve · normalize · deduplicate" },
+      { label: "SQLite", detail: "raw jobs · evaluations · lifecycle" },
+      { label: "Evaluator", detail: "schema · scoring · cost telemetry" },
+      { label: "Interfaces", detail: "dashboard · Telegram digest" },
+    ],
+  },
+  {
+    slug: "daily-momentum-command-center",
+    index: "02",
+    name: "Daily Momentum Command Center",
+    descriptor: "One task workflow across browser and chat",
+    summary:
+      "A private task platform that keeps browser actions, Telegram commands, reminders, and scheduled check-ins on one durable domain model.",
+    role: "Product workflow, API, persistence, messaging interface, reminders, deployment, and tests",
+    technologies: ["Python", "FastAPI", "Pydantic", "SQLite", "Telegram", "systemd"],
+    evidence: [
+      { value: "2", label: "user interfaces" },
+      { value: "38", label: "automated tests" },
+      { value: "1", label: "shared task state" },
+    ],
+    problem:
+      "Tasks entered in chat, reminders, and a browser dashboard easily drift into separate sources of truth. The system needed one durable task model, consistent behavior across interfaces, and reliable reminder semantics.",
+    ownership:
+      "I designed and built the API, SQLite task store, typed domain models, Telegram command layer, reminder workflow, dashboard actions, private deployment, and automated tests.",
+    decisions: [
+      {
+        title: "Make every interface use the same state",
+        body: "The browser UI, API, Telegram commands, check-ins, and reminder sender all use one SQLite-backed TaskStore instead of maintaining interface-specific copies.",
+      },
+      {
+        title: "Model lifecycle behavior explicitly",
+        body: "Create, update, complete, snooze, and permanent delete have distinct semantics. Reminder delivery records the send and advances the schedule instead of silently duplicating notifications.",
+      },
+      {
+        title: "Constrain the API boundary",
+        body: "Typed Pydantic models validate areas, priorities, statuses, time fields, completion criteria, materials, location context, and estimates before data reaches storage.",
+      },
+      {
+        title: "Keep the production footprint appropriate",
+        body: "A supervised user service binds to a private network interface, uses a token gate, persists locally, and exposes a health endpoint for operational verification.",
+      },
+    ],
+    tradeoffs: [
+      "SQLite is appropriate for a single-user service but not a multi-writer SaaS deployment.",
+      "A lightweight command parser favors predictable behavior over unrestricted natural language.",
+      "Private-network deployment reduces exposure but intentionally limits public demos.",
+    ],
+    verification: [
+      "38 automated tests cover the private system.",
+      "CRUD, snooze, reminders, Telegram parsing, dashboard, API, and scheduler behavior are exercised.",
+      "Health checks and direct database readbacks support release verification.",
+      "The same state is exercised through browser and messaging workflows.",
+    ],
+    architecture: [
+      { label: "Interfaces", detail: "browser UI · Telegram" },
+      { label: "FastAPI", detail: "typed requests · domain actions" },
+      { label: "TaskStore", detail: "SQLite lifecycle + reminders" },
+      { label: "Scheduler", detail: "check-ins · due reminders" },
+      { label: "Private access", detail: "token gate · tailnet bind" },
+    ],
+  },
+];
 
 export const EXPERIENCE = [
   {
-    title: "Full Stack Developer II",
     company: "Whitelabel Collaborative",
-    period: "Feb 2021 – Present",
-    location: "Remote",
-    current: true,
+    title: "Full Stack Developer II",
+    period: "2021 — Present",
+    summary:
+      "Delivering production software across healthcare, pharmaceutical, real-estate, and enterprise client environments.",
     highlights: [
-      "Built and maintained large-scale Ruby on Rails applications for healthcare, pharmaceutical, and real estate clients",
-      "Developed a HIPAA-compliant digital prescription portal for secure physician-to-enterprise prescription transmission",
-      "Designed and enhanced RESTful APIs improving reliability and response times for internal tools and external integrations",
-      "Created data-driven dashboards and reporting tools for client financial analysis and historical trend tracking",
-      "Implemented dynamic, performant React interfaces across multiple applications",
-      "Maintained a complex Rails backend helping users compare healthcare providers and reduce costs",
-      "Integrated custom AI agents using LangChain and AutoGen for automated code review, bug detection, and dataset summarization",
-      "Collaborated closely with product managers and designers on feature scoping and delivery",
+      "Built and maintained Ruby on Rails applications and React interfaces for regulated and data-intensive workflows.",
+      "Delivered a HIPAA-conscious prescription workflow for secure physician-to-enterprise transmission.",
+      "Designed APIs, integrations, dashboards, and reporting tools while working directly with product and design partners.",
+      "Introduced AI-assisted workflows for code review, bug detection, and summarization with human validation.",
     ],
   },
   {
-    title: "Full Stack Mobile Development Intern",
     company: "Igedla LLC",
-    period: "Dec 2020 – Apr 2021",
-    location: "Denver, CO",
-    current: false,
+    title: "Full Stack Mobile Development Intern",
+    period: "2020 — 2021",
+    summary: "Built mobile healthcare experiences and helped establish frontend architecture.",
     highlights: [
-      "Developed a symptom-checker chatbot using React Native with Merck Manual API integration",
-      "Built multiple mobile app screens and contributed to frontend architecture decisions",
-      "Designed and launched the company website from scratch using Gatsby and React",
+      "Developed a React Native symptom-checker workflow with Merck Manual API integration.",
+      "Designed and launched the company website with Gatsby and React.",
     ],
   },
   {
-    title: "Drilling Fluids Specialist II",
     company: "Newpark Drilling Fluids",
-    period: "Jul 2018 – Feb 2020",
-    location: "Denver, CO",
-    current: false,
-    previousCareer: true,
+    title: "Drilling Fluids Specialist II",
+    period: "2018 — 2020",
+    summary: "Field engineering in high-stakes operating environments before moving into software.",
     highlights: [
-      "Supported active drilling operations with fluid analysis and cost-effective treatment recommendations",
-      "Produced daily technical reports for rig personnel and engineering teams",
-      "Contributed to a stuck-pipe remediation that saved a client approximately $3M",
+      "Translated live field conditions into cost-aware technical recommendations for rig and engineering teams.",
+      "Contributed to a stuck-pipe remediation that saved a client approximately $3M.",
     ],
-    note: "Previous Career — Engineering Background",
   },
 ];
 
-export const EDUCATION = [
+export const CAPABILITIES = [
   {
-    degree: "B.Sc. in Petroleum Engineering",
-    school: "University of North Dakota",
+    label: "Discover",
+    detail: "Clarify the real workflow, users, constraints, and success criteria before prescribing architecture.",
   },
   {
-    degree: "Full Stack Web Development Program",
-    school: "Flatiron School",
-  },
-];
-
-export const SKILLS: Record<string, string[]> = {
-  "Languages & Frameworks": ["Ruby on Rails", "React", "TypeScript", "JavaScript", "Python", "Node.js"],
-  Frontend: ["React", "Next.js", "Tailwind CSS", "Gatsby", "React Native"],
-  Backend: ["REST APIs", "ActiveRecord", "Background Jobs", "Auth & Authorization"],
-  Database: ["PostgreSQL"],
-  Practices: ["Test-Driven Development", "Performance Optimization", "Code Reviews"],
-  "AI & Automation": ["LangChain", "AutoGen", "AI-Assisted Workflows"],
-  "Domain Expertise": ["HIPAA-Compliant Systems", "Third-Party API Integrations"],
-};
-
-export const BLOG_POSTS = [
-  {
-    title: "Integrating AI Agents into Legacy Rails Apps",
-    excerpt:
-      "How I used LangChain and AutoGen to add AI-powered code review to an existing Rails monolith.",
-    date: "2025-12-15",
-    platform: "Medium",
-    url: "#",
+    label: "Design",
+    detail: "Shape data contracts, APIs, integrations, state transitions, and failure boundaries that teams can reason about.",
   },
   {
-    title: "Living on the Road as a Remote Engineer",
-    excerpt:
-      "5 years of full-time travel, 2 cats, and a career in software — here's what I've learned.",
-    date: "2025-10-22",
-    platform: "Dev.to",
-    url: "#",
+    label: "Deliver",
+    detail: "Build across Rails, React, Next.js, TypeScript, Python, SQL, and third-party systems with tests alongside the work.",
   },
   {
-    title: "Why I Switched from Petroleum Engineering to Software",
-    excerpt:
-      "From drilling rigs to deployment pipelines — my unconventional path into tech.",
-    date: "2025-08-05",
-    platform: "Medium",
-    url: "#",
+    label: "Operate",
+    detail: "Own rollout, monitoring, cost controls, support paths, and the tradeoffs that appear after a system meets production.",
   },
-  {
-    title: "Building HIPAA-Compliant Systems: Lessons Learned",
-    excerpt:
-      "Practical advice for developers working in healthcare software for the first time.",
-    date: "2025-06-18",
-    platform: "Dev.to",
-    url: "#",
-  },
-];
-
-export const TYPING_PHRASES = [
-  "Full Stack Engineer",
-  "React & Rails Specialist",
-  "Building from the road",
-  "5+ years shipping production software",
 ];

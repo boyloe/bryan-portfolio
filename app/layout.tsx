@@ -1,69 +1,89 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Inter } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { PERSONAL } from "@/lib/constants";
 
-const jetbrainsMono = JetBrains_Mono({
+const plexSans = IBM_Plex_Sans({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
   variable: "--font-mono",
   display: "swap",
 });
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
 export const metadata: Metadata = {
-  title: `${PERSONAL.name} — Full Stack Software Engineer`,
+  metadataBase: new URL("https://bryanoyloe.com"),
+  title: {
+    default: "Bryan Oyloe — Full-Stack & Forward Deployed Engineer",
+    template: "%s — Bryan Oyloe",
+  },
   description:
-    "Full stack software engineer with 5+ years of experience building production applications in healthcare, real estate, and construction. React, Rails, TypeScript.",
+    "Full-stack engineer who turns ambiguous customer workflows into reliable production systems across discovery, architecture, delivery, and operations.",
+  keywords: [
+    "full-stack engineer",
+    "forward deployed engineer",
+    "Ruby on Rails",
+    "React",
+    "TypeScript",
+    "Python",
+    "customer-facing engineering",
+  ],
+  authors: [{ name: PERSONAL.name, url: "https://bryanoyloe.com" }],
   openGraph: {
-    title: `${PERSONAL.name} — Full Stack Software Engineer`,
+    title: "Bryan Oyloe — Full-Stack & Forward Deployed Engineer",
     description:
-      "Building production-grade web applications from the road. React, Ruby on Rails, TypeScript, AI integrations.",
+      "Customer-facing systems, production ownership, and sanitized case studies from private operational software.",
     type: "website",
     url: "https://bryanoyloe.com",
+    siteName: "Bryan Oyloe",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${PERSONAL.name} — Full Stack Software Engineer`,
-    description: "Building production-grade web applications from the road.",
-  },
-  other: {
-    "application/ld+json": JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Person",
-      name: PERSONAL.name,
-      jobTitle: PERSONAL.title,
-      email: PERSONAL.email,
-      url: "https://bryanoyloe.com",
-      sameAs: [PERSONAL.github, PERSONAL.linkedin],
-    }),
+    title: "Bryan Oyloe — Full-Stack & Forward Deployed Engineer",
+    description: "From ambiguous workflow to reliable production system.",
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: PERSONAL.name,
+  jobTitle: PERSONAL.role,
+  email: `mailto:${PERSONAL.email}`,
+  url: "https://bryanoyloe.com",
+  sameAs: [PERSONAL.github, PERSONAL.linkedin],
+  knowsAbout: [
+    "Ruby on Rails",
+    "React",
+    "TypeScript",
+    "Python",
+    "API integrations",
+    "Production operations",
+  ],
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${jetbrainsMono.variable} ${inter.variable}`}>
+    <html lang="en" className={`${plexSans.variable} ${plexMono.variable}`}>
       <body>
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded font-mono text-sm"
-          style={{ background: "var(--accent-primary)", color: "#0a0a0f" }}
-        >
+        <a className="skip-link" href="#main-content">
           Skip to content
         </a>
         <Navbar />
         <main id="main-content">{children}</main>
         <Footer />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+        />
       </body>
     </html>
   );
