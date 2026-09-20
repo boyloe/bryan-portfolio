@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
+import path from "node:path";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['204.168.184.80'],
+  turbopack: {
+    root: path.resolve("."),
+  },
 };
 
 export default nextConfig;
