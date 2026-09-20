@@ -559,12 +559,34 @@ summary {
   max-width: 760px;
 }
 
-.experience-content ul,
+.experience-content ul {
+  display: grid;
+  gap: 16px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.experience-content li {
+  position: relative;
+  margin: 0;
+  padding-left: 28px;
+}
+
+.experience-content li::before {
+  content: "";
+  position: absolute;
+  top: 0.72em;
+  left: 0;
+  width: 12px;
+  height: 2px;
+  background: var(--accent);
+}
+
 .evidence-grid ul {
   padding-left: 1.2em;
 }
 
-.experience-content li,
 .evidence-grid li {
   margin: 10px 0;
   padding-left: 8px;
@@ -993,10 +1015,6 @@ summary {
   .experience-list article {
     grid-template-columns: 1fr;
     gap: 24px;
-  }
-
-  .experience-content ul {
-    padding-left: 1em;
   }
 
   .footer-base {
